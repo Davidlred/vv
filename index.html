@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Professor's Colloquium — Invitation Portal</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+      :root { --navy: #2d519e; --gold: #b8943f; --gold-light: #d4af6a; --cream: #faf8f3; --ink: #1a1a2e; }
+      * { box-sizing: border-box; }
+      body { font-family: "EB Garamond", Georgia, serif; background-color: var(--cream); color: var(--ink); }
+      .font-display { font-family: "Playfair Display", Georgia, serif; }
+      .font-sans { font-family: "Josefin Sans", sans-serif; }
+      .gold-line { height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+      .corner-decoration { position: absolute; width: 60px; height: 60px; border-color: var(--gold); border-style: solid; opacity: 0.5; }
+      .corner-tl { top: 16px; left: 16px; border-width: 2px 0 0 2px; }
+      .corner-tr { top: 16px; right: 16px; border-width: 2px 2px 0 0; }
+      .corner-bl { bottom: 16px; left: 16px; border-width: 0 0 2px 2px; }
+      .corner-br { bottom: 16px; right: 16px; border-width: 0 2px 2px 0; }
+      @keyframes floatA { 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-10px) rotate(-1deg)} }
+      @keyframes floatB { 0%,100%{transform:translateY(0) rotate(1.5deg)} 50%{transform:translateY(-8px) rotate(1.5deg)} }
+      @keyframes floatC { 0%,100%{transform:translateY(0) rotate(-0.5deg)} 50%{transform:translateY(-12px) rotate(-0.5deg)} }
+      @keyframes floatD { 0%,100%{transform:translateY(0) rotate(2deg)} 50%{transform:translateY(-6px) rotate(2deg)} }
+      @keyframes floatE { 0%,100%{transform:translateY(0) rotate(-1.5deg)} 50%{transform:translateY(-9px) rotate(-1.5deg)} }
+      .float-a { animation: floatA 6s ease-in-out infinite; }
+      .float-b { animation: floatB 7s ease-in-out infinite; animation-delay: -2s; }
+      .float-c { animation: floatC 5.5s ease-in-out infinite; animation-delay: -1s; }
+      .float-d { animation: floatD 8s ease-in-out infinite; animation-delay: -3s; }
+      .float-e { animation: floatE 6.5s ease-in-out infinite; animation-delay: -1.5s; }
+      .tribute-card { background: white; border: 1px solid #e8e0cc; border-radius: 4px; box-shadow: 4px 6px 20px rgba(0,0,0,0.09); padding: 28px 24px 24px; position: relative; display: inline-block; width: 100%; break-inside: avoid; }
+      .tribute-card::before { content: "\201C"; font-family: "Playfair Display", serif; font-size: 90px; color: var(--gold); opacity: 0.12; position: absolute; top: -14px; left: 12px; line-height: 1; pointer-events: none; }
+      .nav-pill { font-family: "Josefin Sans", sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+      .form-input { width: 100%; padding: 12px 16px; border: 1px solid #d4c9aa; border-radius: 4px; background: white; font-family: "EB Garamond", serif; font-size: 16px; color: var(--ink); transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+      .form-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(184,148,63,0.15); }
+      .form-label { font-family: "Josefin Sans", sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #6b5e3e; display: block; margin-bottom: 6px; }
+      .btn-primary { background: var(--navy); color: #fff; font-family: "Josefin Sans", sans-serif; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; padding: 14px 32px; border: none; border-radius: 2px; cursor: pointer; transition: background 0.2s; width: 100%; }
+      .btn-primary:hover:not(:disabled) { background: #162d5e; }
+      .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
+      .crest-ring { width: 150px; height: 150px; border-radius: 50%; border: 3px solid var(--gold); display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden; background: white; }
+      @keyframes sealPop { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+      .seal-pop { animation: sealPop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+      @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+      .fade-up { animation: fadeUp 0.5s ease forwards; }
+      .char-counter { font-family: "Josefin Sans", sans-serif; font-size: 11px; text-align: right; margin-top: 4px; color: #6b7280; }
+      .char-counter.warning { color: #d97706; font-weight: 600; }
+      .char-counter.error { color: #dc2626; font-weight: 600; }
+    </style>
+</head>
+<body class="min-h-screen">
+  <div id="root"></div>
+  <script>
+    const h = React.createElement;
+    const { useState, useEffect } = React;
+
+    const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxGID_xj61Q5_cgOok-xnN8uzbxlalzktGcGOWbOBG8YqfF1lYnb0RbjavFvIj3u7Y/exec";
+    const MAX_TRIBUTE_WORDS = 60;
+    const SHEET_ID = "1ikBfX3aCF7zjnPM11fGZqiLxNDxmW2pF6YhoCVkheTA";
+    const TRIBUTE_TAB = "Tributes";
+
+    function countWords(text) {
+      return text.trim().split(/\s+/).filter(w => w.length > 0).length;
+    }
+
+    async function fetchTributesFromSheet() {
+      const csvUrl = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(TRIBUTE_TAB) + "&cachebust=" + Date.now();
+      const res = await fetch(csvUrl);
+      const text = await res.text();
+      const rows = text.trim().split("\n").map(function(row) {
+        var cells = [], cur = "", inQ = false;
+        for (var i = 0; i < row.length; i++) {
+          if (row[i] === '"') { inQ = !inQ; }
+          else if (row[i] === "," && !inQ) { cells.push(cur.trim()); cur = ""; }
+          else { cur += row[i]; }
+        }
+        cells.push(cur.trim());
+        return cells;
+      });
+      if (rows.length < 2) return [];
+      return rows.slice(1).map(function(cols) {
+        return {
+          author: (cols[1] || "").replace(/^"|"$/g, ""),
+          message: (cols[2] || "").replace(/^"|"$/g, ""),
+          approved: (cols[3] || "Pending").replace(/^"|"$/g, ""),
+        };
+      }).filter(function(t) { return t.author || t.message; });
+    }
+
+    function IcoCalendar() {
+      return h('svg',{width:18,height:18,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"1.5"},
+        h('rect',{x:3,y:4,width:18,height:18,rx:2}),
+        h('line',{x1:16,y1:2,x2:16,y2:6}),
+        h('line',{x1:8,y1:2,x2:8,y2:6}),
+        h('line',{x1:3,y1:10,x2:21,y2:10}));
+    }
+    function IcoClock() {
+      return h('svg',{width:18,height:18,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"1.5"},
+        h('circle',{cx:12,cy:12,r:10}),
+        h('polyline',{points:"12 6 12 12 16 14"}));
+    }
+    function IcoPin() {
+      return h('svg',{width:18,height:18,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"1.5"},
+        h('path',{d:"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"}),
+        h('circle',{cx:12,cy:10,r:3}));
+    }
+    function IcoSuit() {
+      return h('svg',{width:18,height:18,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"1.5"},
+        h('path',{d:"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"}),
+        h('circle',{cx:12,cy:7,r:4}));
+    }
+    function IcoCheck() {
+      return h('svg',{width:44,height:44,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"1.5"},
+        h('path',{d:"M22 11.08V12a10 10 0 1 1-5.93-9.14"}),
+        h('polyline',{points:"22 4 12 14.01 9 11.01"}));
+    }
+
+    function NavBar(props) {
+      var view = props.view, setView = props.setView;
+      return h('nav', { style: { background: "var(--navy)" }, className: "sticky top-0 z-50 px-6 py-4 shadow-lg" },
+        h('div', { className: "max-w-6xl mx-auto flex items-center justify-between" },
+          h('span', { className: "font-display text-lg italic", style: { color: "var(--gold-light)" } }, "The Colloquium"),
+          h('div', { className: "flex items-center gap-1" },
+            [
+              { key: "invitation", label: "Invitation" },
+              { key: "tributes", label: "Tribute Wall" }
+            ].map(function(item) {
+              return h('button', {
+                key: item.key,
+                onClick: function() { setView(item.key); },
+                className: "nav-pill px-4 py-2 rounded-sm transition-all " + (view === item.key ? "" : "text-white/50 hover:text-white/80"),
+                style: view === item.key ? { background: "rgba(184,148,63,0.25)", color: "var(--gold-light)" } : {}
+              }, item.label);
+            })
+          )
+        )
+      );
+    }
+
+    function ConfirmationScreen(props) {
+      var confirmData = props.confirmData, reset = props.reset;
+      return h('div', { className: "min-h-screen flex items-center justify-center px-4 py-16" },
+        h('div', { className: "max-w-xl w-full text-center fade-up" },
+          h('div', { className: "seal-pop inline-block mb-8" },
+            h('div', { className: "w-28 h-28 rounded-full mx-auto flex items-center justify-center", style: { background: "var(--navy)", border: "4px solid var(--gold)" } },
+              h('span', { style: { color: "var(--gold)" } }, h(IcoCheck))
+            )
+          ),
+          h('h2', { className: "font-display text-4xl mb-2", style: { color: "var(--navy)" } }, "You're Confirmed"),
+          h('p', { className: "text-lg mb-8", style: { color: "#6b5e3e" } }, "Thank you, ", h('em', null, confirmData.fullName), ". We look forward to your presence."),
+          h('div', { className: "relative bg-white border border-amber-200 rounded-sm p-8 mb-6 text-left" },
+            h('div', { className: "corner-decoration corner-tl" }),
+            h('div', { className: "corner-decoration corner-tr" }),
+            h('div', { className: "corner-decoration corner-bl" }),
+            h('div', { className: "corner-decoration corner-br" }),
+            h('div', { className: "font-sans text-xs uppercase tracking-widest mb-4", style: { color: "var(--gold)" } }, "Confirmation Details"),
+            h('div', { className: "space-y-2 text-base" },
+              h('div', { className: "flex justify-between" },
+                h('span', { style: { color: "#6b5e3e" } }, "Reference"),
+                h('span', { className: "font-sans font-semibold", style: { color: "var(--navy)" } }, confirmData.confirmationId)
+              ),
+              h('div', { className: "gold-line my-3" }),
+              h('div', { className: "flex justify-between" },
+                h('span', { style: { color: "#6b5e3e" } }, "Name"),
+                h('span', null, confirmData.fullName)
+              ),
+              h('div', { className: "flex justify-between" },
+                h('span', { style: { color: "#6b5e3e" } }, "Attendance"),
+                h('span', null, confirmData.attendance === "yes" ? "✓ Attending" : "Unable to attend")
+              )
+            )
+          ),
+          h('button', { onClick: reset, className: "btn-primary", style: { width: "auto", padding: "12px 40px" } }, "Return to Invitation")
+        )
+      );
+    }
+
+    function InvitationPage() {
+      var _a = useState({ fullName:"", email:"", phone:"", organization:"", designation:"", attendance:"yes", guestCount:"1", dietaryRequirements:"", tributeMessage:"" });
+      var formData = _a[0], setFormData = _a[1];
+      var _b = useState("form"); var step = _b[0], setStep = _b[1];
+      var _c = useState(false); var isSubmitting = _c[0], setIsSubmitting = _c[1];
+      var _d = useState(null); var confirmData = _d[0], setConfirmData = _d[1];
+      var _e = useState(0); var wordCount = _e[0], setWordCount = _e[1];
+
+      var event = {
+        title: "PST. PROF. B.B FAKAE",
+        subtitle: "Fulfilling Life's Purpose Through Service",
+        date: "Friday, 27th March 2026",
+        time: "2:00 PM",
+        venue: "Dr. Nyesom Ezenwo Wike Senate Building, Rivers State University PH",
+        dress: "Business Formal"
+      };
+
+      function handle(ev) {
+        var name = ev.target.name, value = ev.target.value;
+        if (name === "tributeMessage") setWordCount(countWords(value));
+        setFormData(function(p) { return Object.assign({}, p, { [name]: value }); });
+      }
+
+      function handleSubmit(ev) {
+        ev.preventDefault();
+        if (formData.tributeMessage.trim() && wordCount > MAX_TRIBUTE_WORDS) {
+          alert("Your tribute is " + wordCount + " words. Please reduce it to " + MAX_TRIBUTE_WORDS + " words or less.");
+          return;
+        }
+        setIsSubmitting(true);
+        var confirmationId = "COL-" + Date.now().toString(36).toUpperCase();
+        var payload = Object.assign({}, formData, { confirmationId: confirmationId, timestamp: new Date().toISOString() });
+        fetch(BACKEND_URL + "?action=rsvp", {
+          method: "POST", mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }).then(function() {
+          if (formData.tributeMessage.trim()) {
+            return fetch(BACKEND_URL + "?action=tribute", {
+              method: "POST", mode: "no-cors",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                tributeAuthor: formData.fullName + (formData.designation ? ", " + formData.designation : ""),
+                tributeMessage: formData.tributeMessage,
+                timestamp: new Date().toISOString()
+              })
+            });
+          }
+        }).then(function() {
+          setConfirmData(Object.assign({}, formData, { confirmationId: confirmationId }));
+          setStep("confirmation");
+          setIsSubmitting(false);
+        }).catch(function() {
+          alert("Something went wrong. Please try again.");
+          setIsSubmitting(false);
+        });
+      }
+
+      function reset() {
+        setStep("form");
+        setWordCount(0);
+        setFormData({ fullName:"", email:"", phone:"", organization:"", designation:"", attendance:"yes", guestCount:"1", dietaryRequirements:"", tributeMessage:"" });
+      }
+
+      if (step === "confirmation") return h(ConfirmationScreen, { confirmData: confirmData, reset: reset });
+
+      var wordCountColor = wordCount > MAX_TRIBUTE_WORDS ? "error" : wordCount > MAX_TRIBUTE_WORDS * 0.9 ? "warning" : "";
+
+      var eventCards = [
+        { icon: h(IcoCalendar), label: "Date", val: event.date },
+        { icon: h(IcoClock), label: "Time", val: event.time },
+        { icon: h(IcoPin), label: "Venue", val: event.venue },
+        { icon: h(IcoSuit), label: "Dress Code", val: event.dress }
+      ];
+
+      return h('div', { className: "max-w-5xl mx-auto px-4 py-12" },
+        h('div', { className: "relative text-white rounded-sm overflow-hidden mb-10 fade-up", style: { background: "linear-gradient(135deg, var(--navy) 0%, #1a3060 60%, #0f2044 100%)" } },
+          h('div', { className: "corner-decoration corner-tl", style: { borderColor: "var(--gold)", opacity: 0.6 } }),
+          h('div', { className: "corner-decoration corner-tr", style: { borderColor: "var(--gold)", opacity: 0.6 } }),
+          h('div', { className: "corner-decoration corner-bl", style: { borderColor: "var(--gold)", opacity: 0.6 } }),
+          h('div', { className: "corner-decoration corner-br", style: { borderColor: "var(--gold)", opacity: 0.6 } }),
+          h('div', { className: "relative px-8 py-14 text-center" },
+            h('div', { className: "crest-ring mb-6" },
+              h('img', { src: "mr.jpeg", alt: "Professor", style: { width: "100%", height: "100%", objectFit: "cover" } })
+            ),
+            h('div', { className: "font-sans text-xs tracking-widest mb-3", style: { color: "var(--gold-light)", opacity: 0.8 } },
+              "YOU ARE CORDIALLY INVITED TO A SPECIAL COLLOQUIUM", h('br'), "IN HONOUR OF"
+            ),
+            h('h1', { className: "font-display text-4xl md:text-5xl mb-3 leading-tight" }, event.title),
+            h('div', { className: "gold-line w-32 mx-auto my-5" }),
+            h('p', { className: "font-display italic text-xl", style: { color: "var(--gold-light)" } }, event.subtitle),
+            h('div', { className: "grid grid-cols-2 md:grid-cols-4 gap-4 mt-10 text-left" },
+              eventCards.map(function(card) {
+                return h('div', { key: card.label, className: "rounded-sm p-4", style: { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(184,148,63,0.2)" } },
+                  h('div', { style: { color: "var(--gold-light)" }, className: "mb-2" }, card.icon),
+                  h('div', { className: "font-sans text-xs uppercase tracking-wider mb-1", style: { color: "rgba(255,255,255,0.5)" } }, card.label),
+                  h('div', { className: "text-sm leading-snug" }, card.val)
+                );
+              })
+            )
+          )
+        ),
+        h('div', { className: "bg-white border border-amber-100 rounded-sm p-8 md:p-10 mb-10 shadow-sm fade-up" },
+          h('p', { className: "text-lg leading-relaxed mb-4", style: { color: "#3a2e1e" } }, "Dear Distinguished Guest,"),
+          h('p', { className: "text-lg leading-relaxed mb-4", style: { color: "#3a2e1e" } },
+            "It is with great pleasure that we invite you to attend this special colloquium in honour of ",
+            h('strong', null, "Professor B.B Fakae"),
+            ", whose decades of distinguished service, scholarly excellence, and transformative mentorship have left an indelible mark on many lives."
+          ),
+          h('p', { className: "text-lg leading-relaxed", style: { color: "#3a2e1e" } },
+            "Please complete the form below to confirm your attendance. You may also share a personal tribute."
+          )
+        ),
+        h('div', { className: "bg-white border border-amber-100 rounded-sm shadow-sm overflow-hidden fade-up" },
+          h('div', { className: "px-8 py-6", style: { background: "var(--navy)" } },
+            h('h2', { className: "font-display text-2xl text-white" }, "Registration & Tribute")
+          ),
+          h('form', { onSubmit: handleSubmit, className: "p-8 md:p-10 space-y-10" },
+            h('div', null,
+              h('div', { className: "flex items-center gap-3 mb-6" },
+                h('span', { className: "font-sans text-xs uppercase tracking-widest", style: { color: "var(--gold)" } }, "01 — Personal Details"),
+                h('div', { className: "flex-1 gold-line" })
+              ),
+              h('div', { className: "grid md:grid-cols-2 gap-5" },
+                h('div', null, h('label', { className: "form-label" }, "Full Name *"), h('input', { className: "form-input", type: "text", name: "fullName", required: true, value: formData.fullName, onChange: handle, placeholder: "Dr. Jane Smith" })),
+                h('div', null, h('label', { className: "form-label" }, "Email Address *"), h('input', { className: "form-input", type: "email", name: "email", required: true, value: formData.email, onChange: handle, placeholder: "jane.smith@university.edu" })),
+                h('div', null, h('label', { className: "form-label" }, "Phone Number"), h('input', { className: "form-input", type: "tel", name: "phone", value: formData.phone, onChange: handle, placeholder: "+234 - xxx xxxx" })),
+                h('div', null, h('label', { className: "form-label" }, "Organization"), h('input', { className: "form-input", type: "text", name: "organization", value: formData.organization, onChange: handle, placeholder: "University of ..." })),
+                h('div', { className: "md:col-span-2" }, h('label', { className: "form-label" }, "Designation / Title"), h('input', { className: "form-input", type: "text", name: "designation", value: formData.designation, onChange: handle, placeholder: "Professor, Former Student..." }))
+              )
+            ),
+            h('div', null,
+              h('div', { className: "flex items-center gap-3 mb-6" },
+                h('span', { className: "font-sans text-xs uppercase tracking-widest", style: { color: "var(--gold)" } }, "02 — Attendance"),
+                h('div', { className: "flex-1 gold-line" })
+              ),
+              h('div', null,
+                h('label', { className: "form-label" }, "Will you attend? *"),
+                h('select', { className: "form-input", name: "attendance", required: true, value: formData.attendance, onChange: handle },
+                  h('option', { value: "yes" }, "Yes, I will attend"),
+                  h('option', { value: "no" }, "Regretfully, I cannot attend")
+                )
+              )
+            ),
+            h('div', null,
+              h('div', { className: "flex items-center gap-3 mb-2" },
+                h('span', { className: "font-sans text-xs uppercase tracking-widest", style: { color: "var(--gold)" } }, "03 — Personal Tribute"),
+                h('div', { className: "flex-1 gold-line" }),
+                h('span', { className: "font-sans text-xs", style: { color: "#9ca3af" } }, "Optional")
+              ),
+              h('div', { className: "rounded-sm p-4 mb-4", style: { background: "rgba(184,148,63,0.06)", border: "1px solid rgba(184,148,63,0.2)" } },
+                h('p', { className: "text-sm leading-relaxed", style: { color: "#6b5e3e" } }, "Share a memory or message for Professor Fakae (max " + MAX_TRIBUTE_WORDS + " words).")
+              ),
+              h('textarea', { className: "form-input", name: "tributeMessage", value: formData.tributeMessage, onChange: handle, rows: 6, placeholder: "Write your tribute here..." }),
+              h('div', { className: "char-counter " + wordCountColor },
+                wordCount + " / " + MAX_TRIBUTE_WORDS + " words",
+                wordCount > MAX_TRIBUTE_WORDS ? h('span', { className: "ml-2" }, "⚠️ Too long!") : null
+              )
+            ),
+            h('div', { className: "pt-2" },
+              h('button', { type: "submit", disabled: isSubmitting || wordCount > MAX_TRIBUTE_WORDS, className: "btn-primary" },
+                isSubmitting ? "Submitting..." : "Confirm Registration"
+              )
+            )
+          )
+        )
+      );
+    }
+
+    function TributePage() {
+      var _a = useState([]); var tributes = _a[0], setTributes = _a[1];
+      var _b = useState(true); var loading = _b[0], setLoading = _b[1];
+      var floatClasses = ["float-a", "float-b", "float-c", "float-d", "float-e"];
+
+      function loadTributes() {
+        setLoading(true);
+        fetchTributesFromSheet().then(function(all) {
+          setTributes(all.filter(function(t) { return t.approved === "Approved"; }));
+          setLoading(false);
+        }).catch(function(err) {
+          console.error(err);
+          setLoading(false);
+        });
+      }
+
+      useEffect(function() {
+        loadTributes();
+        var interval = setInterval(loadTributes, 30000);
+        return function() { clearInterval(interval); };
+      }, []);
+
+      var content;
+      if (loading) {
+        content = h('div', { className: "text-center py-20 font-display text-2xl italic fade-up", style: { color: "var(--gold)" } }, "Loading tributes...");
+      } else if (tributes.length === 0) {
+        content = h('div', { className: "text-center py-20 fade-up" },
+          h('div', { className: "font-display text-3xl italic mb-4", style: { color: "var(--navy)" } }, "No tributes yet"),
+          h('p', { style: { color: "#6b5e3e" } }, "Be the first — share a tribute on the Invitation page.")
+        );
+      } else {
+        content = h('div', { className: "max-w-6xl mx-auto" },
+          h('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
+            tributes.map(function(t, i) {
+              return h('div', { key: i, className: "tribute-card mb-6 " + floatClasses[i % floatClasses.length] },
+                h('p', { className: "text-base leading-relaxed mb-5 pt-5 italic", style: { color: "#3a2e1e" } }, "\u201C" + t.message + "\u201D"),
+                h('div', { className: "gold-line mb-3" }),
+                h('div', { className: "font-sans text-xs uppercase tracking-wider", style: { color: "var(--gold)" } }, "\u2014 " + t.author)
+              );
+            })
+          ),
+          h('div', { className: "text-center mt-12 fade-up" },
+            h('span', { className: "font-sans text-xs uppercase tracking-widest", style: { color: "#9ca3af" } },
+              tributes.length + " tribute" + (tributes.length !== 1 ? "s" : "") + " on the wall"
+            )
+          )
+        );
+      }
+
+      return h('div', { className: "min-h-screen px-4 py-12" },
+        h('div', { className: "text-center mb-14 fade-up" },
+          h('div', { className: "font-sans text-xs uppercase tracking-widest mb-4", style: { color: "var(--gold)" } }, "Words from those who know"),
+          h('h1', { className: "font-display text-5xl md:text-6xl mb-4", style: { color: "var(--navy)" } }, "Tribute Wall"),
+          h('div', { className: "gold-line w-40 mx-auto mb-5" }),
+          h('p', { className: "text-lg max-w-xl mx-auto", style: { color: "#6b5e3e" } }, "A living collection of heartfelt messages honouring Professor B.B Fakae's legacy.")
+        ),
+        content
+      );
+    }
+
+    function App() {
+      var _a = useState("invitation"); var view = _a[0], setView = _a[1];
+      return h('div', null,
+        h(NavBar, { view: view, setView: setView }),
+        view === "invitation" && h(InvitationPage),
+        view === "tributes" && h(TributePage),
+        h('footer', { className: "text-center py-10 mt-8 border-t border-amber-100" },
+          h('div', { className: "gold-line w-24 mx-auto mb-4" }),
+          h('p', { className: "font-sans text-xs uppercase tracking-widest", style: { color: "#9ca3af" } }, "\u00A9 2026 \u2014 Professor's Colloquium")
+        )
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+  </script>
+</body>
+</html>

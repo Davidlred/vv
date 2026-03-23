@@ -338,8 +338,7 @@
 
       useEffect(function() {
         loadTributes();
-        var interval=setInterval(loadTributes,30000);
-        return function(){ clearInterval(interval); };
+       
       },[]);
 
       var content;
